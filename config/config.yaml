@@ -1,0 +1,79 @@
+###############################################################################
+#  Bollinger Band Breakout Bot — Master Configuration
+###############################################################################
+
+# ── Exchange ─────────────────────────────────────────────────────────────────
+exchange:
+  name: binance
+  testnet: false                     # flip to false for live trading
+  api_key: ""                       # set via .env  → BINANCE_API_KEY
+  api_secret: ""                    # set via .env  → BINANCE_API_SECRET
+  recv_window: 5000
+
+# ── Trading Universe ──────────────────────────────────────────────────────────
+trading:
+  symbols:
+    - BTCUSDT
+    - ETHUSDT
+    - BNBUSDT
+  default_symbol: BTCUSDT
+  timeframe: "4h"                   # 1m 5m 15m 1h 4h 1d
+  quote_currency: USDT
+  trade_mode: paper                 # paper | live
+
+# ── Strategy ─────────────────────────────────────────────────────────────────
+strategy:
+  name: BollingerBandBreakout
+  bb_period: 20
+  bb_std_dev: 2.0
+  volume_confirm: true              # require volume spike on breakout
+  volume_ma_period: 20
+  volume_multiplier: 1.5
+  atr_period: 14                    # used for dynamic stop-loss
+  squeeze_threshold: 0.02           # bandwidth / price  < threshold → squeeze
+
+# ── Risk Management ───────────────────────────────────────────────────────────
+risk:
+  max_position_pct: 0.10            # max 10 % of portfolio per trade
+  max_open_trades: 3
+  stop_loss_atr_mult: 2.0           # stop = entry − (ATR × mult)
+  take_profit_rr: 2.0               # reward-to-risk ratio
+  trailing_stop: true
+  trailing_stop_pct: 0.03           # 3 % trail
+  max_daily_drawdown_pct: 0.05      # halt trading if daily DD > 5 %
+  max_total_drawdown_pct: 0.15      # halt trading if total DD > 15 %
+
+# ── Backtesting ───────────────────────────────────────────────────────────────
+backtest:
+  start_date: "2023-01-01"
+  end_date:   "2024-12-31"
+  initial_cash: 10000.0
+  commission: 0.001                 # 0.10 % per trade
+  slippage: 0.0005
+
+# ── Data Storage ─────────────────────────────────────────────────────────────
+data:
+  db_path: "database/trading_bot.db"
+  export_dir: "data/exports"
+  historical_dir: "data/historical"
+  max_candles_in_memory: 5000
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging:
+  level: INFO                       # DEBUG | INFO | WARNING | ERROR
+  file: "logs/trading_bot.log"
+  max_bytes: 10485760               # 10 MB
+  backup_count: 5
+
+# ── Dashboard ─────────────────────────────────────────────────────────────────
+dashboard:
+  port: 8501
+  auto_refresh_sec: 30
+  chart_theme: dark
+
+# ── Confluence Strategy (additional params) ───────────────────────────────────
+  min_score: 4               # minimum factors needed to enter (out of 5)
+  swing_period: 5           # bars each side for swing high/low detection
+  structure_lookback: 50     # bars to scan for support/resistance
+  structure_tolerance: 0.002 # 0.5% zone around S/R level
+  fg_trend_period: 5         # days to measure Fear & Greed trend direction
